@@ -206,6 +206,18 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
                                        node.location.lon / COORDINATE_PRECISION));
         }
         subtrace.values["matched_points"] = points;
+        // Routing Instructions
+        if(route_parameters.print_instructions)
+        {
+            std::unique_ptr<BaseDescriptor<DataFacadeT>> descriptor;
+            descriptor = osrm::make_unique<JSONDescriptor<DataFacadeT>>(facade);
+            DescriptorConfig config = route_parameters;
+
+            config.map_matching = true;
+            descriptor->setFactory(factory);
+            descriptor->SetConfig(config);
+            descriptor->Run(raw_route, subtrace);
+        }
 
         return subtrace;
     }
@@ -213,8 +225,6 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
     int HandleRequest(const RouteParameters &route_parameters,
                       osrm::json::Object &json_result) final
     {
-        InternalRouteResult raw_route;
-        DescriptionFactory factory;
 
         // check number of parameters
         if (!check_all_coordinates(route_parameters.coordinates))
@@ -263,6 +273,10 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
         osrm::json::Array matchings;
         for (auto &sub : sub_matchings)
         {
+            InternalRouteResult raw_route;
+            DescriptionFactory factory;
+
+
             // classify result
             if (route_parameters.classify)
             {
@@ -297,24 +311,14 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
                 std::vector<bool>(raw_route.segment_end_coordinates.size(), true), raw_route);
 
             matchings.values.emplace_back(submatchingToJSON(sub, route_parameters, raw_route, factory));
+
         }
 
         if (osrm::json::Logger::get())
             osrm::json::Logger::get()->render("matching", json_result);
         json_result.values["matchings"] = matchings;
 
-        // Routing Instructions
-        if(route_parameters.print_instructions)
-        {
-            std::unique_ptr<BaseDescriptor<DataFacadeT>> descriptor;
-            descriptor = osrm::make_unique<JSONDescriptor<DataFacadeT>>(facade);
-            DescriptorConfig config = route_parameters;
-
-            config.map_matching = true;
-            descriptor->setFactory(factory);
-            descriptor->SetConfig(config);
-            descriptor->Run(raw_route, json_result);
-        }
+       
 
         return 200;
     }
