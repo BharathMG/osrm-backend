@@ -4,13 +4,13 @@ local find_access_tag = require("lib/access").find_access_tag
 local limit = require("lib/maxspeed").limit
 
 -- Begin of globals
-barrier_whitelist = { [""] = true, ["cycle_barrier"] = true, ["bollard"] = true, ["entrance"] = true, ["cattle_grid"] = true, ["border_control"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true }
+barrier_whitelist = { [""] = true, ["bollard"] = true, ["entrance"] = true, ["cattle_grid"] = true, ["border_control"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true }
 access_tag_whitelist = { ["yes"] = true, ["permissive"] = true, ["designated"] = true }
 access_tag_blacklist = { ["no"] = true, ["private"] = true, ["agricultural"] = true, ["forestery"] = true }
 access_tag_restricted = { ["destination"] = true, ["delivery"] = true }
 access_tags_hierachy = { "bicycle", "vehicle", "access" }
 cycleway_tags = {["track"]=true,["lane"]=true,["opposite"]=true,["opposite_lane"]=true,["opposite_track"]=true,["share_busway"]=true,["sharrow"]=true,["shared"]=true }
-service_tag_restricted = { ["parking_aisle"] = true }
+service_tag_restricted = { ["parking_aisle"] = false }
 restriction_exception_tags = { "bicycle", "vehicle", "access" }
 unsafe_highway_list = { ["primary"] = true, ["secondary"] = true, ["tertiary"] = true, ["primary_link"] = true, ["secondary_link"] = true, ["tertiary_link"] = true}
 
@@ -18,22 +18,30 @@ local default_speed = 15
 local walking_speed = 6
 
 bicycle_speeds = {
-  ["cycleway"] = default_speed,
-  ["primary"] = default_speed,
-  ["primary_link"] = default_speed,
-  ["secondary"] = default_speed,
-  ["secondary_link"] = default_speed,
-  ["tertiary"] = default_speed,
-  ["tertiary_link"] = default_speed,
-  ["residential"] = default_speed,
-  ["unclassified"] = default_speed,
-  ["living_street"] = default_speed,
-  ["road"] = default_speed,
-  ["service"] = default_speed,
-  ["track"] = 12,
-  ["path"] = 12
-  --["footway"] = 12,
-  --["pedestrian"] = 12,
+  ["cycleway"] = 24,
+  ["motorway"] = 32,
+  ["motorway_link"] = 25,
+  ["trunk"] = 28,
+  ["trunk_link"] = 25,
+  ["primary"] = 26,
+  ["primary_link"] = 18,
+  ["secondary"] = 24,
+  ["secondary_link"] = 18,
+  ["tertiary"] = 22,
+  ["tertiary_link"] = 22,
+  ["residential"] = 22,
+  ["unclassified"] = 22,
+  ["living_street"] = 17,
+  ["road"] = 22,
+  ["service"] = 19,
+  ["track"] = 9,
+  ["path"] = 9,
+  ["footway"] = 15,
+  ["pedestrian"] = 10,
+  ["pier"] = 5,
+  ["steps"] = 1,
+  ["default"] = 22,
+  ["ferry"] = 26 
 }
 
 pedestrian_speeds = {
