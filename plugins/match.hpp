@@ -160,7 +160,8 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
 
     osrm::json::Object submatchingToJSON(const osrm::matching::SubMatching &sub,
                                          const RouteParameters &route_parameters,
-                                         const InternalRouteResult &raw_route)
+                                         const InternalRouteResult &raw_route,
+                                         DescriptionFactory &factory)
     {
         osrm::json::Object subtrace;
 
@@ -171,7 +172,6 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
 
         if (route_parameters.geometry)
         {
-            DescriptionFactory factory;
             FixedPointCoordinate current_coordinate;
             factory.SetStartSegment(raw_route.segment_end_coordinates.front().source_phantom,
                                     raw_route.source_traversed_in_reverse.front());
@@ -206,6 +206,18 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
                                        node.location.lon / COORDINATE_PRECISION));
         }
         subtrace.values["matched_points"] = points;
+        // Routing Instructions
+        if(route_parameters.print_instructions)
+        {
+            std::unique_ptr<BaseDescriptor<DataFacadeT>> descriptor;
+            descriptor = osrm::make_unique<JSONDescriptor<DataFacadeT>>(facade);
+            DescriptorConfig config = route_parameters;
+
+            config.map_matching = true;
+            descriptor->setFactory(factory);
+            descriptor->SetConfig(config);
+            descriptor->Run(raw_route, subtrace);
+        }
 
         return subtrace;
     }
@@ -213,6 +225,7 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
     int HandleRequest(const RouteParameters &route_parameters,
                       osrm::json::Object &json_result) final
     {
+
         // check number of parameters
         if (!check_all_coordinates(route_parameters.coordinates))
         {
@@ -260,6 +273,10 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
         osrm::json::Array matchings;
         for (auto &sub : sub_matchings)
         {
+            InternalRouteResult raw_route;
+            DescriptionFactory factory;
+
+
             // classify result
             if (route_parameters.classify)
             {
@@ -282,7 +299,6 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
 
             // FIXME we only run this to obtain the geometry
             // The clean way would be to get this directly from the map matching plugin
-            InternalRouteResult raw_route;
             PhantomNodes current_phantom_node_pair;
             for (unsigned i = 0; i < sub.nodes.size() - 1; ++i)
             {
@@ -294,12 +310,15 @@ template <class DataFacadeT> class MapMatchingPlugin : public BasePlugin
                 raw_route.segment_end_coordinates,
                 std::vector<bool>(raw_route.segment_end_coordinates.size(), true), raw_route);
 
-            matchings.values.emplace_back(submatchingToJSON(sub, route_parameters, raw_route));
+            matchings.values.emplace_back(submatchingToJSON(sub, route_parameters, raw_route, factory));
+
         }
 
         if (osrm::json::Logger::get())
             osrm::json::Logger::get()->render("matching", json_result);
         json_result.values["matchings"] = matchings;
+
+       
 
         return 200;
     }
