@@ -4,18 +4,18 @@ local find_access_tag = require("lib/access").find_access_tag
 local limit = require("lib/maxspeed").limit
 
 -- Begin of globals
-barrier_whitelist = { [""] = true, ["bollard"] = true, ["entrance"] = true, ["cattle_grid"] = true, ["border_control"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true }
+barrier_whitelist = { [""] = true }
 access_tag_whitelist = { ["yes"] = true, ["permissive"] = true, ["designated"] = true }
-access_tag_blacklist = { ["no"] = true, ["private"] = true, ["agricultural"] = true, ["forestery"] = true }
+access_tag_blacklist = { ["no"] = true }
 access_tag_restricted = { ["destination"] = true, ["delivery"] = true }
 access_tags_hierachy = { "bicycle", "vehicle", "access" }
-cycleway_tags = {["track"]=true,["lane"]=true,["opposite"]=true,["opposite_lane"]=true,["opposite_track"]=true,["share_busway"]=true,["sharrow"]=true,["shared"]=true }
+cycleway_tags = {["ferry"]=true,["track"]=true,["lane"]=true,["opposite"]=true,["opposite_lane"]=true,["opposite_track"]=true,["share_busway"]=true,["sharrow"]=true,["shared"]=true }
 service_tag_restricted = { ["parking_aisle"] = false }
 restriction_exception_tags = { "bicycle", "vehicle", "access" }
-unsafe_highway_list = { ["primary"] = true, ["secondary"] = true, ["tertiary"] = true, ["primary_link"] = true, ["secondary_link"] = true, ["tertiary_link"] = true}
+unsafe_highway_list = { }
 
-local default_speed = 15
-local walking_speed = 6
+local default_speed = 25
+local walking_speed = 5
 
 bicycle_speeds = {
   ["cycleway"] = 24,
@@ -23,7 +23,7 @@ bicycle_speeds = {
   ["motorway_link"] = 25,
   ["trunk"] = 28,
   ["trunk_link"] = 25,
-  ["primary"] = 26,
+  ["primary"] = 10,
   ["primary_link"] = 18,
   ["secondary"] = 24,
   ["secondary_link"] = 18,
@@ -41,7 +41,7 @@ bicycle_speeds = {
   ["pier"] = 5,
   ["steps"] = 1,
   ["default"] = 22,
-  ["ferry"] = 26 
+  ["ferry"] = 10 
 }
 
 pedestrian_speeds = {
@@ -102,9 +102,9 @@ surface_speeds = {
 traffic_signal_penalty          = 2
 use_turn_restrictions           = false
 
-local obey_oneway               = true
+local obey_oneway               = false
 local obey_bollards             = false
-local ignore_areas              = true
+local ignore_areas              = false
 local u_turn_penalty            = 20
 local turn_penalty              = 60
 local turn_bias                 = 1.4
