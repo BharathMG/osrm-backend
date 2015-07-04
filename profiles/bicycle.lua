@@ -4,7 +4,7 @@ local find_access_tag = require("lib/access").find_access_tag
 local limit = require("lib/maxspeed").limit
 
 -- Begin of globals
-barrier_whitelist = { [""] = true }
+barrier_whitelist = { [""] = true, ["bollard"] = true, ["entrance"] = true, ["cattle_grid"] = true, ["border_control"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true  }
 access_tag_whitelist = { ["yes"] = true, ["permissive"] = true, ["designated"] = true }
 access_tag_blacklist = { ["no"] = true }
 access_tag_restricted = { ["destination"] = true, ["delivery"] = true }
@@ -23,7 +23,7 @@ bicycle_speeds = {
   ["motorway_link"] = 25,
   ["trunk"] = 28,
   ["trunk_link"] = 25,
-  ["primary"] = 10,
+  ["primary"] = 26,
   ["primary_link"] = 18,
   ["secondary"] = 24,
   ["secondary_link"] = 18,
@@ -102,7 +102,7 @@ surface_speeds = {
 traffic_signal_penalty          = 2
 use_turn_restrictions           = false
 
-local obey_oneway               = false
+local obey_oneway               = true
 local obey_bollards             = false
 local ignore_areas              = false
 local u_turn_penalty            = 20
